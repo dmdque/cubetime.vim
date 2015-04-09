@@ -17,10 +17,10 @@ function! s:toggle_timer()
     let g:timesList += [g:endtime]
     echo "time: " . g:endtime
     if len(g:timesList) >= 5
-      echo "average of last 5: " . printf('%f', g:mean(s:tailList(g:timesList, 5)))
+      echo "average of last 5: " . printf('%f', g:mean(g:removeMaxAndMin(s:tailList(g:timesList, 5))))
     endif
     if len(g:timesList) >= 12
-      echo "average of last 12: " . printf('%f', g:mean(s:tailList(g:timesList, 12)))
+      echo "average of last 12: " . printf('%f', g:mean(g:removeMaxAndMin(s:tailList(g:timesList, 12))))
     endif
     if len(g:timesList) >= 2
       echo "session mean(" . len(g:timesList) . "): " . printf('%f', g:mean(g:timesList))
