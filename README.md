@@ -13,6 +13,7 @@ These bindings are by no means final. But as it stands right now:
 - tracks average of last 5
 - tracks average of last 12
 - displays 3x3 scramble
+- allows editing times in buffer
 
 ### Soon to be implemented:
 

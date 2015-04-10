@@ -1,3 +1,7 @@
+" TODO:
+" - change functions to not use g: (capitalize instead)
+" - move code into autoload
+
 " Exit when your app has already been loaded (or "compatible" mode set)
 "if exists("g:loaded_cubetime") || &cp
   "finish
@@ -8,24 +12,57 @@
 let s:timerRunFlag = 0
 let g:timesList = []
 function! s:toggle_timer()
+  if !exists("g:timerBufferFlag") || g:timerBufferFlag == 0 || @% !=? "cubetime"
+      new cubetime
+      execute "normal! 7o\<esc>gg"
+      let g:timerBufferFlag = 1
+  endif
+  " TODO: switch to cubetime window if it's already open
+  " bufferTimes are times yanked from cubetime buffer. there might be a better name for this
+  let bufferTimes = split(getline(8), 'times: ')
+  if len(bufferTimes) > 0
+    let g:timesList = split(bufferTimes[0], ' ')
+  else
+    let g:timesList = []
+  endif
+
   if s:timerRunFlag == 0
     let s:timerRunFlag = 1
     let s:starttime = reltime()
+    " TODO: echon is temp fix to prevent having to "press any key to continue"
+    echon "timer running..."
   else
     let g:endtime = split(reltimestr(reltime(s:starttime)))[0] " split used to remove leading space, as suggested by :h
+    echo g:endtime
     let s:timerRunFlag = 0
     let g:timesList += [g:endtime]
-    echo "time: " . g:endtime
+    call setline(3, "time: " . g:endtime)
     if len(g:timesList) >= 5
-      echo "average of last 5: " . printf('%f', g:mean(g:removeMaxAndMin(s:tailList(g:timesList, 5))))
+      call setline(5, "average of last 5: " . printf('%f', g:mean(g:removeMaxAndMin(s:tailList(g:timesList, 5)))))
+    else
+      call setline(5, "")
     endif
     if len(g:timesList) >= 12
-      echo "average of last 12: " . printf('%f', g:mean(g:removeMaxAndMin(s:tailList(g:timesList, 12))))
+      call setline(6, "average of last 12: " . printf('%f', g:mean(g:removeMaxAndMin(s:tailList(g:timesList, 12)))))
+    else
+      call setline(6, "")
     endif
     if len(g:timesList) >= 2
-      echo "session mean(" . len(g:timesList) . "): " . printf('%f', g:mean(g:timesList))
+      call setline(7, "session mean (" . len(g:timesList) . "): " . printf('%f', g:mean(g:timesList)))
+    else
+      call setline(7, "")
     endif
-    echo "scramble: " . g:getScramble()
+    call setline(1, "scramble: " . g:getScramble())
+
+    " format output of times
+    " TODO: replace this with vital.vim fold
+    let timesStr = ""
+    for item in g:timesList
+      " consider using commas
+      let timesStr .= item . " "
+    endfor
+
+    call setline(8, "times: " . timesStr)
   endif
 endfunction
 
@@ -48,8 +85,8 @@ endfunction
 function! g:removeMaxAndMin(numList)
     let sortedNumList = copy(a:numList)
     let sortedNumList = sort(sortedNumList)
-    echo remove(sortedNumList, len(a:numList) - 1)
-    echo remove(sortedNumList, 0)
+    call remove(sortedNumList, len(a:numList) - 1)
+    call remove(sortedNumList, 0)
     return sortedNumList
 endfunction
 
