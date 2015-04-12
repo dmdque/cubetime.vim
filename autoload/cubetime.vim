@@ -8,10 +8,18 @@
 "endif
 "let g:loaded_cubetime = 0.0 " your version number
 
+"let s:V = vital#of('cubetime')
+"let s:L = s:V.import('Data.List')
+
+"function g:thefunction(times)
+  "let sum = s:L.foldl1('v:memo + str2float(v:val)', a:times)
+  "echo 'sum: ' . sum
+"endfunction
+
 " cube timer plugin
 let s:timerRunFlag = 0
 let g:timesList = []
-function! s:toggle_timer()
+function! cubetime#toggle_timer()
   if !exists("g:timerBufferFlag") || g:timerBufferFlag == 0 || @% !=? "cubetime"
       new cubetime
       execute "normal! 7o\<esc>gg"
@@ -89,6 +97,10 @@ function! g:removeMaxAndMin(numList)
     call remove(sortedNumList, len(a:numList) - 1)
     call remove(sortedNumList, 0)
     return sortedNumList
+endfunction
+
+
+function! s:bestRollingAo5(timesList)
 endfunction
 
 " test example
