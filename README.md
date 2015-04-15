@@ -9,17 +9,14 @@ These bindings are by no means final. But as it stands right now:
 
 ### What cubetime.vim does:
 
+- displays time in updating timer
 - tracks session mean
-- tracks average of last 5
-- tracks average of last 12
+- tracks average/best average of 5/12
 - displays 3x3 scramble
 - allows editing times in buffer
 
 ### Soon to be implemented:
 
-- best rolling average of 5
-- best rolling average of 12
 - mean of last 100
 - best rolling mean of 100
-- better interface for displaying information (most likely in a buffer)
 - tnoodle integration
