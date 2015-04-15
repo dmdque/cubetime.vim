@@ -1,8 +1,10 @@
 " TODO:
-" - change functions to not use g: (capitalize instead)
 " - function to update averages once modified in buffer (abstract logic)
 " - change "cubetime" buffer to variable
 " - limit times to two digits
+" - bind keys only for cubetime buffer
+" - fix buffer multiple splits problem
+" - fix buffer setline not enough lines problem
 
 " Exit when your app has already been loaded (or "compatible" mode set)
 "if exists("g:loaded_cubetime") || &cp
@@ -21,13 +23,6 @@ let s:line_ao12 = 7
 let s:line_bao12 = 8
 let s:line_mean = 9
 let s:line_timesList = 10
-
-"" vital example
-"function g:thefunction(times)
-  "let sum = s:L.foldl1('v:memo + str2float(v:val)', a:times)
-  "echon 'sum: '
-  "echo sum
-"endfunction
 
 " cube timer plugin
 let s:timerRunFlag = 0
@@ -60,21 +55,21 @@ function! cubetime#toggle_timer()
     let g:timesList += [g:endtime]
     call setline(s:line_time, "time: " . g:endtime)
     if len(g:timesList) >= 5
-      call setline(s:line_ao5, "average of last 5: " . printf('%f', g:averageOfN(g:timesList, 5)))
-      call setline(s:line_bao5, "best average of 5: " . printf('%f', g:bestRollingAoN(g:timesList, 5)))
+      call setline(s:line_ao5, "average of last 5: " . printf('%f', AverageOfN(g:timesList, 5)))
+      call setline(s:line_bao5, "best average of 5: " . printf('%f', BestRollingAoN(g:timesList, 5)))
     else
       call setline(s:line_ao5, "")
       call setline(s:line_bao5, "")
     endif
     if len(g:timesList) >= 12
-      call setline(s:line_ao12, "average of last 12: " . printf('%f', g:averageOfN(g:timesList, 12)))
-      call setline(s:line_bao12, "best average of 12: " . printf('%f', g:bestRollingAoN(g:timesList, 12)))
+      call setline(s:line_ao12, "average of last 12: " . printf('%f', AverageOfN(g:timesList, 12)))
+      call setline(s:line_bao12, "best average of 12: " . printf('%f', BestRollingAoN(g:timesList, 12)))
     else
       call setline(s:line_ao12, "")
       call setline(s:line_bao12, "")
     endif
     if len(g:timesList) >= 2
-      call setline(s:line_mean, "session mean (" . len(g:timesList) . "): " . printf('%f', g:mean(g:timesList)))
+      call setline(s:line_mean, "session mean (" . len(g:timesList) . "): " . printf('%f', Mean(g:timesList)))
     else
       call setline(s:line_mean, "")
     endif
@@ -93,13 +88,15 @@ function! cubetime#toggle_timer()
   endif
 endfunction
 
-function! g:mean(timeList)
+" List => Float
+function! Mean(timeList)
   let s:sum = g:L.foldl("v:memo + str2float(v:val)", 0, a:timeList)
   return s:sum / len(a:timeList)
 endfunction
 
-function! g:averageOfN(timeList, n)
-  return g:mean(g:removeMaxAndMin(s:tailList(a:timeList, a:n)))
+" List, Number => Float
+function! AverageOfN(timeList, n)
+  return Mean(RemoveMaxAndMin(s:tailList(a:timeList, a:n)))
 endfunction
 
 " List, Number => List
@@ -108,8 +105,9 @@ function! s:tailList(list, n)
   return a:list[len(a:list) - a:n : len(a:list)]
 endfunction
 
+" List => List
 " mutates numList
-function! g:removeMaxAndMin(numList)
+function! RemoveMaxAndMin(numList)
     let sortedNumList = copy(a:numList)
     let sortedNumList = sort(sortedNumList)
     call remove(sortedNumList, len(a:numList) - 1)
@@ -117,11 +115,12 @@ function! g:removeMaxAndMin(numList)
     return sortedNumList
 endfunction
 
-function! g:bestRollingAoN(timesList, n)
+" List, Number => List
+function! BestRollingAoN(timesList, n)
   let i = a:n - 1
   let s:minAvg = 1000 " TODO: change to non-arbitrary value
   while i < len(a:timesList)
-    let s:avg = g:mean(g:removeMaxAndMin(a:timesList[i - (a:n - 1) : i]))
+    let s:avg = Mean(RemoveMaxAndMin(a:timesList[i - (a:n - 1) : i]))
     if s:avg < s:minAvg
       let s:minAvg = s:avg
     endif
