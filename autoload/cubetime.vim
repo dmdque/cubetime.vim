@@ -50,16 +50,18 @@ function! cubetime#toggle_timer()
     let g:timesList += [g:endtime]
     call setline(3, "time: " . g:endtime)
     if len(g:timesList) >= 5
-      call setline(5, "average of last 5: " . printf('%f', g:mean(g:removeMaxAndMin(s:tailList(g:timesList, 5)))))
-      call setline(6, "best average of 5: " . printf('%f', g:bestRollingAo5(g:timesList)))
+      call setline(5, "average of last 5: " . printf('%f', g:averageOfN(g:timesList, 5)))
+      call setline(6, "best average of 5: " . printf('%f', g:bestRollingAoN(g:timesList, 5)))
     else
       call setline(5, "")
       call setline(6, "")
     endif
     if len(g:timesList) >= 12
-      call setline(7, "average of last 12: " . printf('%f', g:mean(g:removeMaxAndMin(s:tailList(g:timesList, 12)))))
+      call setline(7, "average of last 12: " . printf('%f', g:averageOfN(g:timesList, 12)))
+      call setline(8, "best average of 12: " . printf('%f', g:bestRollingAoN(g:timesList, 12)))
     else
       call setline(7, "")
+      call setline(8, "")
     endif
     if len(g:timesList) >= 2
       call setline(9, "session mean (" . len(g:timesList) . "): " . printf('%f', g:mean(g:timesList)))
@@ -89,6 +91,10 @@ function! g:mean(timeList)
   return s:sum / len(a:timeList)
 endfunction
 
+function! g:averageOfN(timeList, n)
+  return g:mean(g:removeMaxAndMin(s:tailList(a:timeList, a:n)))
+endfunction
+
 " List, Number => List
 " Returns the last n elements of the List
 function! s:tailList(list, n)
@@ -104,11 +110,11 @@ function! g:removeMaxAndMin(numList)
     return sortedNumList
 endfunction
 
-function! g:bestRollingAo5(timesList)
-  let i = 4
+function! g:bestRollingAoN(timesList, n)
+  let i = a:n - 1
   let s:minAvg = 1000 " TODO: change to non-arbitrary value
   while i < len(a:timesList)
-    let s:avg = g:mean(g:removeMaxAndMin(a:timesList[i-4 : i]))
+    let s:avg = g:mean(g:removeMaxAndMin(a:timesList[i - (a:n - 1) : i]))
     if s:avg < s:minAvg
       let s:minAvg = s:avg
     endif
