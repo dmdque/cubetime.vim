@@ -1,7 +1,8 @@
 " TODO:
-"
 " - change functions to not use g: (capitalize instead)
-" - abstract removeMaxAndMin
+" - function to update averages once modified in buffer (abstract logic)
+" - change "cubetime" buffer to variable
+" - limit times to two digits
 
 " Exit when your app has already been loaded (or "compatible" mode set)
 "if exists("g:loaded_cubetime") || &cp
@@ -11,6 +12,15 @@
 
 let s:V = vital#of('cubetime')
 let s:L = s:V.import('Data.List')
+
+let s:line_scramble = 1
+let s:line_time = 3
+let s:line_ao5 = 5
+let s:line_bao5 = 6
+let s:line_ao12 = 7
+let s:line_bao12 = 8
+let s:line_mean = 9
+let s:line_timesList = 10
 
 "" vital example
 "function g:thefunction(times)
@@ -45,30 +55,30 @@ function! cubetime#toggle_timer()
     echon "timer running..."
   else
     let g:endtime = split(reltimestr(reltime(s:starttime)))[0] " split used to remove leading space, as suggested by :h
-    echo g:endtime
+    echon g:endtime
     let s:timerRunFlag = 0
     let g:timesList += [g:endtime]
-    call setline(3, "time: " . g:endtime)
+    call setline(s:line_time, "time: " . g:endtime)
     if len(g:timesList) >= 5
-      call setline(5, "average of last 5: " . printf('%f', g:averageOfN(g:timesList, 5)))
-      call setline(6, "best average of 5: " . printf('%f', g:bestRollingAoN(g:timesList, 5)))
+      call setline(s:line_ao5, "average of last 5: " . printf('%f', g:averageOfN(g:timesList, 5)))
+      call setline(s:line_bao5, "best average of 5: " . printf('%f', g:bestRollingAoN(g:timesList, 5)))
     else
-      call setline(5, "")
-      call setline(6, "")
+      call setline(s:line_ao5, "")
+      call setline(s:line_bao5, "")
     endif
     if len(g:timesList) >= 12
-      call setline(7, "average of last 12: " . printf('%f', g:averageOfN(g:timesList, 12)))
-      call setline(8, "best average of 12: " . printf('%f', g:bestRollingAoN(g:timesList, 12)))
+      call setline(s:line_ao12, "average of last 12: " . printf('%f', g:averageOfN(g:timesList, 12)))
+      call setline(s:line_bao12, "best average of 12: " . printf('%f', g:bestRollingAoN(g:timesList, 12)))
     else
-      call setline(7, "")
-      call setline(8, "")
+      call setline(s:line_ao12, "")
+      call setline(s:line_bao12, "")
     endif
     if len(g:timesList) >= 2
-      call setline(9, "session mean (" . len(g:timesList) . "): " . printf('%f', g:mean(g:timesList)))
+      call setline(s:line_mean, "session mean (" . len(g:timesList) . "): " . printf('%f', g:mean(g:timesList)))
     else
-      call setline(9, "")
+      call setline(s:line_mean, "")
     endif
-    call setline(1, "scramble: " . scramble#getScramble())
+    call setline(s:line_scramble, "scramble: " . scramble#getScramble())
 
     " format output of times
     " TODO: replace this with vital.vim fold
@@ -78,7 +88,7 @@ function! cubetime#toggle_timer()
       let timesStr .= item . " "
     endfor
 
-    call setline(10, "times: " . timesStr)
+    call setline(s:line_timesList, "times: " . timesStr)
   endif
 endfunction
 
@@ -125,5 +135,16 @@ endfunction
 
 " test example
 " input = [1, 3, 2, 4, 5]
-" removeMaxAndMin:[ 2, 3, 4]
+" removeMaxAndMin: [2, 3, 4]
 " mean: 3.0
+
+" hack for timer suggested by wiki
+autocmd CursorHold * call Timer()
+function! Timer()
+  if s:timerRunFlag
+    call feedkeys("f\e") " QUESTION: why this?
+    if bufname('') == "cubetime"
+      call setline(s:line_time, "time: " . split(reltimestr(reltime(s:starttime)))[0])
+    endif
+  endif
+endfunction
