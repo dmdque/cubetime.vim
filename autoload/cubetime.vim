@@ -11,7 +11,7 @@
 "let g:loaded_cubetime = 0.0 " your version number
 
 let s:V = vital#of('cubetime')
-let s:L = s:V.import('Data.List')
+let g:L = s:V.import('Data.List')
 
 let s:line_scramble = 1
 let s:line_time = 3
@@ -81,23 +81,20 @@ function! cubetime#toggle_timer()
     call setline(s:line_scramble, "scramble: " . scramble#getScramble())
 
     " format output of times
-    " TODO: replace this with vital.vim fold
-    let timesStr = ""
-    for item in g:timesList
-      " consider using commas
-      let timesStr .= item . " "
-    endfor
+    " TODO: trailing " "
+    let timesStr = g:L.foldl("v:memo . v:val . ' '", "", g:timesList)
+    "let timesStr = ""
+    "for item in g:timesList
+      "" consider using commas
+      "let timesStr .= item . " "
+    "endfor
 
     call setline(s:line_timesList, "times: " . timesStr)
   endif
 endfunction
 
 function! g:mean(timeList)
-  " TODO: use vital's foldl
-  let s:sum = 0
-  for item in a:timeList
-    let s:sum = s:sum + str2float(item)
-  endfor
+  let s:sum = g:L.foldl("v:memo + str2float(v:val)", 0, a:timeList)
   return s:sum / len(a:timeList)
 endfunction
 
