@@ -14,6 +14,7 @@
 
 let s:V = vital#of('cubetime')
 let g:L = s:V.import('Data.List')
+let s:B = s:V.import('Vim.Buffer')
 
 let s:line_scramble = 1
 let s:line_time = 3
