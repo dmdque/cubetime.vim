@@ -73,7 +73,7 @@ function! cubetime#toggle_timer()
     else
       call setline(s:line_mean, "")
     endif
-    call setline(s:line_scramble, "scramble: " . scramble#getScramble())
+    call setline(s:line_scramble, "scramble: " . cubetime#scramble#getScramble())
 
     " format output of times
     " TODO: trailing " "
