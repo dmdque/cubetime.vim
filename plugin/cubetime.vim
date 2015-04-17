@@ -5,5 +5,8 @@ nnoremap <Space>l :<C-u>echo g:cubetime#timesList<Cr>
 " <SID>
 nnoremap <Space>s :<C-u>echo cubetime#scramble#getScramble()<Cr>
 
-" hack for timer suggested by wiki
-autocmd CursorHold * call cubetime#timer()
+augroup cubetime-timer
+  autocmd!
+  " hack for timer suggested by wiki
+  autocmd CursorHold * call cubetime#timer()
+augroup END
