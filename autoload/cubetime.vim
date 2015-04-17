@@ -136,6 +136,10 @@ endfunction
 " mean: 3.0
 
 function! cubetime#timer()
+  if s:B.is_cmdwin()
+    return
+  endif
+
   if s:timerRunFlag
     call feedkeys("f\e") " QUESTION: why this?
     if bufname('') == "cubetime"
