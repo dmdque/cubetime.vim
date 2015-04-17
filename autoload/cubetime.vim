@@ -26,7 +26,7 @@ let s:line_timesList = 10
 
 " cube timer plugin
 let s:timerRunFlag = 0
-let g:timesList = []
+let g:cubetime#timesList = []
 function! cubetime#toggle_timer()
   if !exists("g:timerBufferFlag") || g:timerBufferFlag == 0 || @% !=? "cubetime"
       new cubetime
@@ -37,9 +37,9 @@ function! cubetime#toggle_timer()
   " bufferTimes are times yanked from cubetime buffer. there might be a better name for this
   let bufferTimes = split(getline(10), 'times: ')
   if len(bufferTimes) > 0
-    let g:timesList = split(bufferTimes[0], ' ')
+    let g:cubetime#timesList = split(bufferTimes[0], ' ')
   else
-    let g:timesList = []
+    let g:cubetime#timesList = []
   endif
 
   if s:timerRunFlag == 0
@@ -52,24 +52,24 @@ function! cubetime#toggle_timer()
     let g:endtime = split(reltimestr(reltime(s:starttime)))[0] " split used to remove leading space, as suggested by :h
     echon g:endtime
     let s:timerRunFlag = 0
-    let g:timesList += [g:endtime]
+    let g:cubetime#timesList += [g:endtime]
     call setline(s:line_time, "time: " . g:endtime)
-    if len(g:timesList) >= 5
-      call setline(s:line_ao5, "average of last 5: " . printf('%f', AverageOfN(g:timesList, 5)))
-      call setline(s:line_bao5, "best average of 5: " . printf('%f', BestRollingAoN(g:timesList, 5)))
+    if len(g:cubetime#timesList) >= 5
+      call setline(s:line_ao5, "average of last 5: " . printf('%f', AverageOfN(g:cubetime#timesList, 5)))
+      call setline(s:line_bao5, "best average of 5: " . printf('%f', BestRollingAoN(g:cubetime#timesList, 5)))
     else
       call setline(s:line_ao5, "")
       call setline(s:line_bao5, "")
     endif
-    if len(g:timesList) >= 12
-      call setline(s:line_ao12, "average of last 12: " . printf('%f', AverageOfN(g:timesList, 12)))
-      call setline(s:line_bao12, "best average of 12: " . printf('%f', BestRollingAoN(g:timesList, 12)))
+    if len(g:cubetime#timesList) >= 12
+      call setline(s:line_ao12, "average of last 12: " . printf('%f', AverageOfN(g:cubetime#timesList, 12)))
+      call setline(s:line_bao12, "best average of 12: " . printf('%f', BestRollingAoN(g:cubetime#timesList, 12)))
     else
       call setline(s:line_ao12, "")
       call setline(s:line_bao12, "")
     endif
-    if len(g:timesList) >= 2
-      call setline(s:line_mean, "session mean (" . len(g:timesList) . "): " . printf('%f', Mean(g:timesList)))
+    if len(g:cubetime#timesList) >= 2
+      call setline(s:line_mean, "session mean (" . len(g:cubetime#timesList) . "): " . printf('%f', Mean(g:cubetime#timesList)))
     else
       call setline(s:line_mean, "")
     endif
@@ -77,9 +77,9 @@ function! cubetime#toggle_timer()
 
     " format output of times
     " TODO: trailing " "
-    let timesStr = g:L.foldl("v:memo . v:val . ' '", "", g:timesList)
+    let timesStr = g:L.foldl("v:memo . v:val . ' '", "", g:cubetime#timesList)
     "let timesStr = ""
-    "for item in g:timesList
+    "for item in g:cubetime#timesList
       "" consider using commas
       "let timesStr .= item . " "
     "endfor
