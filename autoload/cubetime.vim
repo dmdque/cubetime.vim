@@ -135,8 +135,8 @@ endfunction
 " mean: 3.0
 
 " hack for timer suggested by wiki
-autocmd CursorHold * call Timer()
-function! Timer()
+autocmd CursorHold * call cubetime#timer()
+function! cubetime#timer()
   if s:timerRunFlag
     call feedkeys("f\e") " QUESTION: why this?
     if bufname('') == "cubetime"
