@@ -42,10 +42,12 @@ endfunction
 
 function! Main()
   let s:lastMove = ""
+  let s:scramble = []
   for item in range(25)
     let s:lastMove = GenerateMove(s:lastMove)
-    echon s:lastMove . GenerateModifier() . " "
+    let s:scramble += [s:lastMove . GenerateModifier()]
   endfor
+  return s:scramble
 endfunction
 
 " unused function
@@ -65,4 +67,11 @@ function! MapMoves(move)
     endif
 endfunction
 
-call Main()
+function! PrintScramble()
+    let s:myscramble = Main()
+    for item in s:myscramble
+        echon item . " "
+    endfor
+endfunction
+
+call PrintScramble()
