@@ -135,9 +135,9 @@ function! cubetime#timer()
   if s:B.is_cmdwin()
     return
   endif
+  call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
 
   if s:timerRunFlag
-    call feedkeys("f\e") " QUESTION: why this?
     if bufname('') == "cubetime"
       call setline(s:line_time, "time: " . split(reltimestr(reltime(s:starttime)))[0])
     endif
