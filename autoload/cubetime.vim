@@ -109,11 +109,7 @@ endfunction
 " List => List
 " mutates numList
 function! RemoveMaxAndMin(numList)
-    let sortedNumList = copy(a:numList)
-    let sortedNumList = sort(sortedNumList)
-    call remove(sortedNumList, len(a:numList) - 1)
-    call remove(sortedNumList, 0)
-    return sortedNumList
+    return sort(copy(a:numList))[1 : -2]
 endfunction
 
 " List, Number => List
